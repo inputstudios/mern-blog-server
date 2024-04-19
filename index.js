@@ -52,3 +52,8 @@ app.use((err, req, res, next) => {
       message,
    });
 });
+
+app.use((req, res, next) => {
+   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+   next();
+});
