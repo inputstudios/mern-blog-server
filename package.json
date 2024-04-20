@@ -4,6 +4,7 @@
   "description": "",
   "type": "module",
   "main": "index.js",
+  "proxy": "https://mern-blog-server-2xk1.onrender.com",
   "scripts": {
     "dev": "nodemon api/index.js",
     "start": "node api/index.js"
