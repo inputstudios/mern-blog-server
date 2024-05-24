@@ -24,19 +24,20 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(function(req, res, next) {
-   const allowedOrigins = ['http://localhost:5173', 'https://inputstudios.vercel.app'];
-   const origin = req.headers.origin;
-   if (allowedOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-   }
-   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-   next();
-});
-
-app.listen(3000, () => {
-   console.log("Server is running on port 3000!");
-});
+// Настройки CORS
+const allowedOrigins = ['http://localhost:5173', 'https://inputstudios.vercel.app'];
+app.use(cors({
+   origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+         callback(null, true);
+      } else {
+         callback(new Error('Not allowed by CORS'));
+      }
+   },
+   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+   allowedHeaders: ['Content-Type', 'Authorization'],
+   credentials: true
+}));
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -53,7 +54,7 @@ app.get('/', async (req, res) => {
 
 app.use((err, req, res, next) => {
    const statusCode = err.statusCode || 500;
-   const message = err.message || " InternalServer Error";
+   const message = err.message || "Internal Server Error";
    res.status(statusCode).json({
       success: false,
       statusCode,
@@ -64,4 +65,9 @@ app.use((err, req, res, next) => {
 app.use((req, res, next) => {
    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
    next();
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+   console.log(`Server is running on port ${PORT}!`);
 });
